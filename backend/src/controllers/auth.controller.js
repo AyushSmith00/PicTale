@@ -2,6 +2,7 @@ import bcrypt from "bcrypt"
 import User from "../models/User.js"
 import generateAccessToken from "../utils/generateAccessToken.js";
 import generateRefreshToken from "../utils/generateRefreshToken.js";
+import jwt from "jsonwebtoken";
 
 export const register = async(req, res) => {
     try {
@@ -103,5 +104,94 @@ export const login = async(req, res) => {
     } catch (error) {
         console.error(error)
         return res.status(500).json({message: "Server Error!! Login Failed"})
+    }
+}
+
+export const logout = async(req, res) => {
+    try {
+
+        const {refreshToken} = req.cookies
+
+        if(!refreshToken){
+            return res.status(401).json({message: "Refresh token not found"})
+        }
+
+        const decoded = jwt.verify(
+            refreshToken,
+            process.env.JWT_REFRESH_SECRET,
+        )
+
+        const user = await User.findById(decoded.userId)
+
+        if(!user){
+            return res.status(404).json({message: "User not Found"})
+        }
+
+        if(user.refreshToken !== refreshToken){
+            return res.status(401).json({message: "Invalid Refresh Token"})
+        }
+
+        user.refreshToken = null
+
+        await user.save({validateBeforeSave: false})
+
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+        });
+
+        return res.status(200).json({message: "Logout Successfully"})
+
+    } catch (error) {
+        console.error(error)
+        return res.status(500).json({message: "Server Error !! Logout Error !!"})
+    }
+}
+
+export const refresh = async() => {
+    try {
+        const {refreshToken} = req.cookies
+
+        if(!refreshToken){
+            return res.status(404).json({message: "Refresh Token Not Found"})
+        }
+
+        const decoded = jwt.verify(
+            refreshToken,
+            process.env.JWT_REFRESH_SECRET
+        )
+
+        const user = await User.findById(decoded.userId)
+
+        if(!user){
+            return res.status(404).json({message: "user not found"})
+        }
+
+        if(!user.refreshToken !== refreshToken){
+            return res.status(401).json({message: "Invalid refresh token"})
+        }
+
+        const newAccessToken = generateAccessToken(user._id)
+        const newRefreshToken = generateRefreshToken(user._id)
+
+        await user.save({validateBeforeSave: false})
+
+        res.cookie("refreshToken", newRefreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
+        return res.status(200).json({
+            accessToken: newAccessToken
+        })
+
+    } catch (error) {
+        console.error(error)
+        return res.status(500).json({
+            message: "Server Error!! Refresh Token Failed"
+        })
     }
 }
