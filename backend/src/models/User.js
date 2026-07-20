@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
         required: [true, "username is required"],
         unique: [true, "Username should be unique"],
         trim: true,
-        minlength: [6, "The minimum leght is 6"],
+        minlength: [5, "The minimum lenght is 6"],
         maxlength: [38, "The maximum length is 38"],
         unique: true
     },
@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: null,
     }
-}, {timestamps: true}),
+},  { timestamps: true });
 
 const User = mongoose.model("User", userSchema)
 
