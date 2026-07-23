@@ -1,7 +1,6 @@
 import {protect} from "../middleware/auth.middleware.js"
 import {createPost, updatePost, deletePost, getAllPost, getPostbyId} from "../controllers/post.controller.js"
 import express from "express"
-import { get } from "mongoose"
 
 const router = express.Router()
 
