@@ -1,13 +1,19 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import { useState, useEffect } from 'react'
+import {BrowserRouter, Routes, Route} from "react-router-dom";
+import Home from './pages/Home.jsx';
+import Login from './pages/Login.jsx';
+import Register from './pages/Register.jsx';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [loading, setloading] = useState(true)
 
   return (
     <>
-      <h1 className="text-3xl font-bold underline">Welcome To PicTale</h1>
+      <Routes>
+          <Route path='/' element={<Home/>}/>
+          <Route path='/login' element={<Login/>}/>
+          <Route path='/register' element={<Register/>}/>
+      </Routes>
     </>
   )
 }
