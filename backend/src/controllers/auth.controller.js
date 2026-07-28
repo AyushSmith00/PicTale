@@ -149,7 +149,7 @@ export const logout = async(req, res) => {
     }
 }
 
-export const refresh = async() => {
+export const refresh = async(req, res) => {
     try {
         const {refreshToken} = req.cookies
 
@@ -192,6 +192,28 @@ export const refresh = async() => {
         console.error(error)
         return res.status(500).json({
             message: "Server Error!! Refresh Token Failed"
+        })
+    }
+}
+
+export const getMe = async(req, res) => {
+    try {
+        
+        const user = await User.findById(req.user._id).select("-password -refreshToken")
+
+        if(!user){
+            return res.status(404).json({
+                message: "User not found"
+            })
+        }
+
+        return res.status(200).json(user)
+
+    } catch (error) {
+        console.error(error)
+        
+        return res.status(500).json({
+            message: "Server Error !! GetMe failed "
         })
     }
 }
