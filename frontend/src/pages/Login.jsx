@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -8,6 +9,7 @@ function Login() {
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
+    const { setUser } = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -15,18 +17,25 @@ function Login() {
         try {
             setLoading(true);
 
+            // Login user
             const response = await api.post("/auth/login", {
                 email,
                 password,
             });
 
-            console.log(response.data);
-
+            // Save access token
             localStorage.setItem(
                 "accessToken",
                 response.data.accessToken
             );
 
+            // Fetch logged in user
+            const me = await api.get("/auth/me");
+
+            // Save user in AuthContext
+            setUser(me.data);
+
+            // Go to Home
             navigate("/");
 
         } catch (error) {
@@ -64,6 +73,7 @@ function Login() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="w-full rounded-lg bg-gray-800 border border-gray-700 px-4 py-3 text-white outline-none focus:border-blue-500"
+                            required
                         />
                     </div>
 
@@ -78,6 +88,7 @@ function Login() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className="w-full rounded-lg bg-gray-800 border border-gray-700 px-4 py-3 text-white outline-none focus:border-blue-500"
+                            required
                         />
                     </div>
 
