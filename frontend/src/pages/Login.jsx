@@ -17,25 +17,23 @@ function Login() {
         try {
             setLoading(true);
 
-            // Login user
             const response = await api.post("/auth/login", {
                 email,
                 password,
             });
 
-            // Save access token
             localStorage.setItem(
                 "accessToken",
                 response.data.accessToken
             );
 
-            // Fetch logged in user
+            
             const me = await api.get("/auth/me");
 
-            // Save user in AuthContext
+            
             setUser(me.data);
 
-            // Go to Home
+            
             navigate("/");
 
         } catch (error) {

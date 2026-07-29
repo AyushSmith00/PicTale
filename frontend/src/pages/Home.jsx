@@ -1,26 +1,25 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import api from "../api/axios";
 
 function Home() {
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-
-        const getMe = async () => {
+        const getPosts = async () => {
             try {
+                const response = await api.get("/post");
 
-                const response = await api.get("/auth/me");
-
-                console.log(response.data);
+                setPosts(response.data.posts);
 
             } catch (error) {
-
                 console.error(error.response?.data || error.message);
-
+            } finally {
+                setLoading(false);
             }
         };
 
-        getMe();
-
+        getPosts();
     }, []);
 
     return (
@@ -39,45 +38,56 @@ function Home() {
 
             </section>
 
-            <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-
-                <div className="rounded-2xl border border-gray-800 bg-gray-900 p-5">
-                    <div className="mb-4 h-52 rounded-xl bg-gray-800"></div>
-
-                    <h2 className="text-xl font-semibold text-white">
+            {loading ? (
+                <h2 className="text-center text-xl text-gray-300">
+                    Loading...
+                </h2>
+            ) : posts.length === 0 ? (
+                <div className="rounded-2xl border border-gray-800 bg-gray-900 p-8 text-center">
+                    <h2 className="text-2xl font-semibold text-white">
                         No Posts Yet
                     </h2>
 
                     <p className="mt-2 text-gray-400">
-                        Once users start sharing stories, they'll appear here.
+                        Be the first one to share your story.
                     </p>
                 </div>
+            ) : (
+                <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 
-                <div className="rounded-2xl border border-gray-800 bg-gray-900 p-5">
-                    <div className="mb-4 h-52 rounded-xl bg-gray-800"></div>
+                    {posts.map((post) => (
+                        <div
+                            key={post._id}
+                            className="overflow-hidden rounded-2xl border border-gray-800 bg-gray-900"
+                        >
 
-                    <h2 className="text-xl font-semibold text-white">
-                        No Posts Yet
-                    </h2>
+                            <img
+                                src={post.imageUrl}
+                                alt={post.title}
+                                className="h-56 w-full object-cover"
+                            />
 
-                    <p className="mt-2 text-gray-400">
-                        Start by creating your first post.
-                    </p>
-                </div>
+                            <div className="p-5">
 
-                <div className="rounded-2xl border border-gray-800 bg-gray-900 p-5">
-                    <div className="mb-4 h-52 rounded-xl bg-gray-800"></div>
+                                <h2 className="text-xl font-bold text-white">
+                                    {post.title}
+                                </h2>
 
-                    <h2 className="text-xl font-semibold text-white">
-                        No Posts Yet
-                    </h2>
+                                <p className="mt-3 text-gray-400 line-clamp-3">
+                                    {post.content}
+                                </p>
 
-                    <p className="mt-2 text-gray-400">
-                        Your stories will inspire others.
-                    </p>
-                </div>
+                                <p className="mt-4 text-sm text-gray-500">
+                                    By {post.author?.username}
+                                </p>
 
-            </section>
+                            </div>
+
+                        </div>
+                    ))}
+
+                </section>
+            )}
 
         </div>
     );
