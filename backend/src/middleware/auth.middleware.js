@@ -32,6 +32,6 @@ export const protect = async(req, res, next) => {
     } catch (error) {
 
         console.error(error)
-        return res.status(500).json({message: "Server Error!! Middleware Problem !! Invalid or expired Access Token"})
+        return res.status(401).json({message: "Invalid or expired Access Token"})
     }
 }

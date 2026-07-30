@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import api from "../api/axios";
 
 function Home() {
@@ -13,7 +14,9 @@ function Home() {
                 setPosts(response.data.posts);
 
             } catch (error) {
-                console.error(error.response?.data || error.message);
+                console.error(
+                    error.response?.data || error.message
+                );
             } finally {
                 setLoading(false);
             }
@@ -24,6 +27,8 @@ function Home() {
 
     return (
         <div className="mx-auto max-w-7xl px-6 py-10">
+
+    
 
             <section className="mb-10 text-center">
 
@@ -38,12 +43,21 @@ function Home() {
 
             </section>
 
+
+            
+
             {loading ? (
+
                 <h2 className="text-center text-xl text-gray-300">
                     Loading...
                 </h2>
+
             ) : posts.length === 0 ? (
+
+                
+
                 <div className="rounded-2xl border border-gray-800 bg-gray-900 p-8 text-center">
+
                     <h2 className="text-2xl font-semibold text-white">
                         No Posts Yet
                     </h2>
@@ -51,21 +65,37 @@ function Home() {
                     <p className="mt-2 text-gray-400">
                         Be the first one to share your story.
                     </p>
+
                 </div>
+
             ) : (
+
+                
+
                 <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 
                     {posts.map((post) => (
-                        <div
+
+                        <Link
                             key={post._id}
-                            className="overflow-hidden rounded-2xl border border-gray-800 bg-gray-900"
+                            to={`/post/${post._id}`}
+                            className="group overflow-hidden rounded-2xl border border-gray-800 bg-gray-900 transition duration-300 hover:-translate-y-1 hover:border-gray-700"
                         >
 
-                            <img
-                                src={post.imageUrl}
-                                alt={post.title}
-                                className="h-56 w-full object-cover"
-                            />
+                            
+
+                            <div className="overflow-hidden">
+
+                                <img
+                                    src={post.imageUrl}
+                                    alt={post.title}
+                                    className="h-56 w-full object-cover transition duration-300 group-hover:scale-105"
+                                />
+
+                            </div>
+
+
+                            
 
                             <div className="p-5">
 
@@ -73,20 +103,26 @@ function Home() {
                                     {post.title}
                                 </h2>
 
-                                <p className="mt-3 text-gray-400 line-clamp-3">
+                                <p className="mt-3 line-clamp-3 text-gray-400">
                                     {post.content}
                                 </p>
 
-                                <p className="mt-4 text-sm text-gray-500">
+                                <p className="mt-4 text-sm font-medium text-blue-500">
+                                    Read full story →
+                                </p>
+
+                                <p className="mt-2 text-sm text-gray-500">
                                     By {post.author?.username}
                                 </p>
 
                             </div>
 
-                        </div>
+                        </Link>
+
                     ))}
 
                 </section>
+
             )}
 
         </div>

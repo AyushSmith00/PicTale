@@ -168,12 +168,14 @@ export const refresh = async(req, res) => {
             return res.status(404).json({message: "user not found"})
         }
 
-        if(!user.refreshToken !== refreshToken){
+        if(user.refreshToken !== refreshToken){
             return res.status(401).json({message: "Invalid refresh token"})
         }
 
         const newAccessToken = generateAccessToken(user._id)
         const newRefreshToken = generateRefreshToken(user._id)
+
+        user.refreshToken = newRefreshToken
 
         await user.save({validateBeforeSave: false})
 
