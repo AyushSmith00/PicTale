@@ -24,6 +24,16 @@ const postSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
+        },
+        crop: {
+            x: {
+                type: Number,
+                default: 50,
+            },
+            y: {
+                type: Number,
+                default: 50,
+            }
         }
         
     }, {timestamps: true},

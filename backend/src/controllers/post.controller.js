@@ -2,7 +2,7 @@ import Post from "../models/Post.js"
 
 export const createPost = async(req, res) => {
     try {
-        const {title, content, imageUrl} = req.body;
+        const {title, content, imageUrl, crop} = req.body;
 
         if(!title || !content || !imageUrl){
             return res.status(400).json({message: "All the Fields are required"})
@@ -12,6 +12,7 @@ export const createPost = async(req, res) => {
             title,
             content,
             imageUrl,
+            crop,
             author: req.user._id,
         });
 
@@ -76,7 +77,7 @@ export const updatePost = async(req, res) => {
         
         const {id} = req.params
 
-        const{title, content, imageUrl} = req.body
+        const{title, content, imageUrl, crop } = req.body
 
         const post = await Post.findById(id)
 
@@ -91,6 +92,10 @@ export const updatePost = async(req, res) => {
         post.title = title || post.title;
         post.content = content || post.content;
         post.imageUrl = imageUrl || post.imageUrl;
+
+        if(crop){
+            post.crop = crop
+        }
 
         await post.save()
 
